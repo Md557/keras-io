@@ -42,11 +42,11 @@ Printing information about the shuffled dataframe:
 print(df_shuffled.info())
 
 """
-Total number of "disaster" and "non-disaster" tweets:
+Total number of texts:
 """
 
 print(
-    "Total Number of disaster and non-disaster tweets: "
+    "Total Number of texts: "
     f"{df_shuffled.target.value_counts()}"
 )
 
@@ -68,12 +68,12 @@ test_records = len(test_df)
 print(f"Using {len(train_df)} samples for training and {test_records} for validation")
 
 """
-Total number of "disaster" and "non-disaster" tweets in the training data:
+Total number of texts in the training data:
 """
 print(train_df["target"].value_counts())
 
 """
-Total number of "disaster" and "non-disaster" tweets in the test data:
+Total number of texts in the test data:
 """
 
 print(test_df["target"].value_counts())
