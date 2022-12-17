@@ -64,7 +64,7 @@ Dataset description:
 
 # Turn .csv files into pandas DataFrame's
 df = pd.read_csv(
-    "train.csv"
+    "tweet-train.csv"
     # "https://raw.githubusercontent.com/IMvision12/Tweets-Classification-NLP/main/train.csv"
 )
 print(df.head())
