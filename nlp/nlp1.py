@@ -1,8 +1,5 @@
 """
 Title: Text classification using Decision Forests and pretrained embeddings
-Usage: source venv/bin/activate
-pip install -r requirements.txt
-python nlp1.py
 
 """
 
@@ -17,9 +14,9 @@ import matplotlib.pyplot as plt
 
 # Turn .csv files into pandas DataFrame's
 
-PRETRAINED_EMBEDDINGS = False
+PRETRAINED_EMBEDDINGS = True
 TRAIN_FILE = "nlp1_train.csv"  # this is used for both training & test data
-
+RANDOM_STATE = None  # set to integer to have predictible results
 
 df = pd.read_csv(
     TRAIN_FILE
@@ -31,7 +28,7 @@ print(f"Training dataset shape: {df.shape}")
 Shuffling and dropping unnecessary columns:
 """
 
-df_shuffled = df.sample(frac=1, random_state=42)
+df_shuffled = df.sample(frac=1, random_state=RANDOM_STATE)
 # Dropping id, keyword and location columns as these columns consists of mostly nan values
 # we will be using only text and target columns
 df_shuffled.drop(["id"], axis=1, inplace=True)
@@ -65,7 +62,7 @@ for index, example in df_shuffled[:5].iterrows():
 """
 Splitting dataset into training and test sets:
 """
-test_df = df_shuffled.sample(frac=0.3, random_state=42)
+test_df = df_shuffled.sample(frac=0.3, random_state=RANDOM_STATE)
 train_df = df_shuffled.drop(test_df.index)
 test_records = len(test_df)
 print(f"Using {len(train_df)} samples for training and {test_records} for validation")
@@ -221,7 +218,7 @@ print("model_1 Evaluation: \n")
 
 
 test_df.reset_index(inplace=True, drop=True)
-score = 0
+sum_correct = 0
 for index, row in test_df.iterrows():
     print(f"------- row {index+1} -------")
     text = tf.expand_dims(row["text"], axis=0)
@@ -232,17 +229,15 @@ for index, row in test_df.iterrows():
     print(f"Prediction (n dim array, n=# classes): {preds}")
     preds_np = preds.numpy()
     index_prediction = np.argmax(preds_np)
-    print(f"prediction using largest index: {index_prediction}, "
-          f"confidence: {preds_np[index_prediction]}")  # {preds[index_prediction]}
-    print(f"Ground Truth : {row['target']}")
+    result = ""
+    if row['target'] == index_prediction:
+        result = "CORRECT"
+        sum_correct += 1
+    else:
+        result = "INCORRECT"
+    print(f"Prediction of index: [{index_prediction}] is [{result}] (Expected: [{row['target']}]) with "
+          f"confidence=[{preds_np[index_prediction]}]")  # {preds[index_prediction]}
     if preds[index_prediction] <= 0.5:
         print("WARNING: LOW CONFIDENCE")
-    if row['target'] == index_prediction:
-        print("CORRECT")
-        score += 1
-    else:
-        print("INCORRECT")
-    if index == 10:
-        break
 
-print(f"-=-=-=-=- SCORE -=-=-=-=-    =   {float(score/test_records)}")
+print(f"-=-=-=-=- PREDICTION SCORE -=-=-=-=-    =   {float(sum_correct/test_records)}")
